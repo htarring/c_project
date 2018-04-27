@@ -50,3 +50,5 @@ modules.order
 Module.symvers
 Mkfile.old
 dkms.conf
+LinuxSerial_Operation/Lserial_RW.c
+.gitignore
