@@ -12,4 +12,5 @@ int main ()
 int testuplaod()
 {
     printf("Just a test!!!");
+    return 1;
 }
