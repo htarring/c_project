@@ -1,5 +1,11 @@
 #include "stdio.h"
 #include "stdlib.h"
+
+/*
+ *purpose :验证优先级，单目运算符，结合律从右往左....
+ *time    :2018.4
+ *user    :htarring
+ * */
 int main()
 {
      char *test ,*test1;
