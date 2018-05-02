@@ -17,12 +17,17 @@
 /*!
  * function name :串口初始化
  * explain :暂时初始化俩个串口结构体的内存分配
+ * 
  */
-int safe_malloc(int const *length)
+int * safe_malloc(int  const length)
 {
 	ErrorType errorNum = defaulterror;
-	*length = 
-
+	if(length<=0)
+	 {
+		 errorNum = error_malloc_length；
+		 return 
+	 }
+	return (malloc());
 }
 int serial_init(void)
 {

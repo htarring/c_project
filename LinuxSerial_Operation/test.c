@@ -14,7 +14,7 @@ int main()
     *test = 1 ;
     test1 = test;
     printf("%d  %d\r\n",*test,*test1);
-    //*test--;
-    *test -=1;
+    (*test)--;
+    //*test -=1;
     printf("0x%x %d   %d\r\n",test,*test,*test1);
 }
