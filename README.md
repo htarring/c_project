@@ -1,2 +1,2 @@
 # c_project
-verify some ideas。
+verify some ideas.
