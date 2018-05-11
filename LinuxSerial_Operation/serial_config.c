@@ -13,7 +13,7 @@
 #include "misc.h"
 
 
-
+//流程设计不好，应该先设计接口在编码...
 
 /*!
  * macro variable defined
