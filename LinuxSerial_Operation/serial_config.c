@@ -22,7 +22,10 @@
  */
 static struct termios *oldtio, *newtio;
 
-
+/*!
+ * addtional : 串口文件指针
+ * */
+static int *p_file_serial = 0;
 
 
 
@@ -34,19 +37,35 @@ static struct termios *oldtio, *newtio;
  */
 inline int * safe_malloc(const int length)
 {
-	ErrorType errorNum = defaulterror;
+	ErrorType errorNum = No_error;
 	if(length<=0)
 	 {
 		 errorNum = error_malloc_length;
-		 return 
+		 return errorNum;
 	 }
 	return (malloc(length));
 }
-int serial_init(void)
+
+inline ErrorType Safe_fClose(int *p){
+
+	ErrorType errorNum = No_error;
+	if( p == NULL )
+	{
+		errorNum = error_pfile;
+		return errorNum;
+	}
+	close(*p);
+	return errorNum;
+}
+/*!
+ *分配内存
+ * */
+static int serial_init(void)
 {
 	ErrorType errorNum = defaulterror;
 	newtio = safe_malloc(sizeof(struct termios));
-	
+	oldtio = safe_malloc(sizeof(struct termios));
+	//p_file_serial = safe_malloc(sizeof (int));
 }
 
 
@@ -56,50 +75,59 @@ int serial_init(void)
  * output:open successful or error num
  * addtional: the port own read and write method ,and not block ctty.
  */
-int open_serial(char *name)
+int open_serial(char *name,int *const p_file_serial)
 {
-	int fd;
-	fd = open(name, O_RDWR| O_NOCTTY);//O_NDELAY
-	if(fd < 0)
+	*p_file_serial = open(*name, O_RDWR| O_NOCTTY);//O_NDELAY
+	if(*p_file_serial < 0)
 	{
-		perror(name);
+		perror(*name);
 		exit(1);
 	}
-	printf("open serial: %s sucessful!\n",name);
-	return fd;
+	printf("open serial: %s sucessful!\n",*name);
+
+	return No_error;
 }
 
-/*!
- *function name :
- */
-//串口设置函数，check为大写“O,E,N”,nStop为1,0；
-int set_serial(int fd, int nSpeed, int nBit, char check, int nStop, struct termios tio1,struct termios tio2)
-{
-	struct termios oldtio, newtio;
+int Close_Serial(char *name,int *const p_file_serial){
 	
-	if(tcgetattr(fd,&oldtio) != 0)  
-    {  
-        perror("Get Serial fail:");  
-        exit(1);  
-    }
-	bzero(&newtio, sizeof(newtio));
-	
-	newtio.c_cflag |= CLOCAL| CREAD;
+	ErrorType errorNum = No_error;
+	errorNum = Safe_fClose(p_file_serial);
+	printf("close serial: %s successful ! \n",*name);
+	return errorNum;
+}
 
-	newtio.c_cflag &= ~CSIZE;
-	switch(nBit)  //传输多少数据位
-    {  
-        case 7:  
-			newtio.c_cflag |= CS7;  
-			break;  
-        case 8:  
-			newtio.c_cflag |= CS8;  
-			break;      
-    }
+
+inline static ErrorType Set_DataBit(int nBit){
+
+	ErrorType errornum = No_error;
 	
-	switch(check)  //大写字符
-    {  
-        case 'O': //奇校验 
+	switch (nBit)
+	{
+		case 7:
+		    newtio.c_cflag |= CS7;  
+			break;
+		case 8:
+		    newtio.c_cflag |= CS8;  
+			break;
+		case 9 :
+		    newtio.c_cflag |= CS9;  
+			break;
+        // default : 8bit
+		default:
+		    newtio.c_cflag |= CS8;
+			errornum = error_NostandardnBit;
+			break;
+	}
+	return errornum;
+}
+
+inline static ErrorType Set_CheckMode(char check){
+
+	ErrorType errornum = No_error;
+	
+	switch (check)
+	{
+		case 'O': //奇校验 
            	newtio.c_cflag |= PARENB;  
        		newtio.c_cflag |= PARODD;  
        		newtio.c_iflag |= (INPCK| ISTRIP);  
@@ -111,16 +139,27 @@ int set_serial(int fd, int nSpeed, int nBit, char check, int nStop, struct termi
        		break;  
     	case 'N': //不进行 
         	newtio.c_cflag &= ~PARENB;  
-        	break;  
-    }
-	
+        	break; 
+		// default :'N'	
+		default:
+		    newtio.c_cflag &= ~PARENB;
+			errornum = error_Nostandardcheck;
+			break;
+	}
+	return errornum;
+}
+
+inline static ErrorType Set_DataSpeed(int nSpeed){
+
+	ErrorType errornum = No_error;
+
 	switch(nSpeed)  //传输速度
     {  
         case 2400:  
 			cfsetispeed(&newtio,B2400);  
 			cfsetospeed(&newtio,B2400);  
 			break;  
-   	case 9600:  
+   	    case 9600:  
 			cfsetispeed(&newtio,B9600);  
 			cfsetospeed(&newtio,B9600);  
 			break;  
@@ -128,21 +167,72 @@ int set_serial(int fd, int nSpeed, int nBit, char check, int nStop, struct termi
 			cfsetispeed(&newtio,B38400);  
 			cfsetospeed(&newtio,B38400);  
 			break;
-	default:  
-			cfsetispeed(&newtio,B9600);  
-			cfsetospeed(&newtio,B9600);  
+		case 57600:
+	     	cfsetispeed(&newtio,B57600);  
+			cfsetospeed(&newtio,B57600);
+			break;
+		case 115200:
+		    cfsetispeed(&newtio,B115200);  
+			cfsetospeed(&newtio,B115200);
+			break;
+			// default :115200
+		default:  
+			cfsetispeed(&newtio,B115200);  
+			cfsetospeed(&newtio,B115200);  
             		break;
 	}
-	
-	//停止位1清除CSTOPB，0是激活
-	if(nStop == 1){  
-        newtio.c_cflag &= ~CSTOPB;  
-    }  
-    else if(nStop == 0){  
-        newtio.c_cflag |= CSTOPB;  
+	return errornum;
+}
+
+inline static ErrorType Set_StopBit(int nStop){
+
+	ErrorType errornum = No_error;
+	switch (nStop)
+	{
+		case 0:
+		    newtio.c_cflag |= CSTOPB; 
+			break;
+		case 1:
+		    newtio.c_cflag &= ~CSTOPB; 
+			break;
+		case 1_5:
+		    //等待翻阅文档.....
+			break;
+			//默认一个停止位
+		default:
+            newtio.c_cflag &= ~CSTOPB;
+		    break;
+	}
+
+	return errornum;
+}
+
+/*!
+ *function name :
+ */
+//串口设置函数，check为大写“O,E,N”,nStop为1,0；
+int set_serial(int fd, int nSpeed, int nBit, char check, int nStop, struct termios tio1,struct termios tio2)
+{
+	//struct termios oldtio, newtio;
+	ErrorType errornum = No_error;
+	if(tcgetattr(fd,&oldtio) != 0)  
+    {  
+        perror("Get Serial fail:");  
+        exit(1);  
     }
-    
-    //change output format
+	bzero(&newtio, sizeof(newtio));
+	
+	newtio.c_cflag |= CLOCAL| CREAD;
+	newtio.c_cflag &= ~CSIZE;
+
+	errornum = Set_DataBit(nBit);
+	errornum = Set_CheckMode(check);
+	errornum = Set_DataSpeed(nSpeed);
+
+	//停止位1清除CSTOPB，0是激活
+	errornum = Set_StopBit(nStop);
+
+	//change output format
     newtio.c_iflag &= ~(ICANON| ECHO| ECHOE| ISIG);//original data input
     newtio.c_oflag &= ~OPOST;//original data output
 	
