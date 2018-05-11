@@ -3,7 +3,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
-#include <termios.h>
+//#include <termios.h>
 #include <errno.h>
 #include <string.h>
 #include <stdlib.h>
@@ -14,25 +14,38 @@
 
 
 
+
+/*!
+ * macro variable defined
+ * explain :声明了俩个串口信息的结构体，并且是全局变量，便于其他模块调用
+ * addtional :对外拥有 get method ，只有内部可设
+ */
+static struct termios *oldtio, *newtio;
+
+
+
+
+
 /*!
  * function name :串口初始化
  * explain :暂时初始化俩个串口结构体的内存分配
- * 
+ * addtional:@1:加这么一层封装的意义在于防止出现长度0的内存分配情况
+ *           @2:使用内联关键字缩减程序大小
  */
-int * safe_malloc(int  const length)
+inline int * safe_malloc(const int length)
 {
 	ErrorType errorNum = defaulterror;
 	if(length<=0)
 	 {
-		 errorNum = error_malloc_length；
+		 errorNum = error_malloc_length;
 		 return 
 	 }
-	return (malloc());
+	return (malloc(length));
 }
 int serial_init(void)
 {
 	ErrorType errorNum = defaulterror;
-	newtio = malloc(sizeof(termios));
+	newtio = safe_malloc(sizeof(struct termios));
 	
 }
 
@@ -41,6 +54,7 @@ int serial_init(void)
  * function name :串口打开函数
  * input: serial_num name
  * output:open successful or error num
+ * addtional: the port own read and write method ,and not block ctty.
  */
 int open_serial(char *name)
 {

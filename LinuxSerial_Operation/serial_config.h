@@ -14,11 +14,6 @@
 #define MIN_READ_BIT   50     //byte not confirmed
 #define MAXREAD        50     //byte not confirmed
 
-/*!
- * macro variable defined
- * explain :声明了俩个串口信息的结构体，并且是全局变量，便于其他模块调用
- */
-struct termios *oldtio, *newtio;
 
 
 

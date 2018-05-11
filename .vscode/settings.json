@@ -1,3 +1,4 @@
 {
-    "aliosStudio.sdkPath": "C:\\Users\\Administrator\\.aos\\AliOS-Things"
+    "aliosStudio.sdkPath": "C:\\Users\\Administrator\\.aos\\AliOS-Things",
+    "C_Cpp.intelliSenseEngineFallback": "Disabled"
 }

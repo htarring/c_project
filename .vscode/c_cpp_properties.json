@@ -11,9 +11,9 @@
                 "C:/Program Files/LLVM/lib/gcc/x86_64-w64-mingw32/7.2.0/include",
                 "C:/Program Files/LLVM/include",
                 "C:/Program Files/LLVM/x86_64-w64-mingw32/include",
-                "C:/Program Files/LLVM/lib/gcc/x86_64-w64-mingw32/7.2.0/include-fixed"
+                "C:/Program Files/LLVM/lib/gcc/x86_64-w64-mingw32/7.2.0/include-fixed",
+                "D:/vscode_workspace/c/project/c_project/LinuxSerial_Operation"
             ],
-            
             "defines": [
                 "_DEBUG",
                 "UNICODE",
@@ -29,7 +29,8 @@
                     "C:/Program Files/LLVM/lib/gcc/x86_64-w64-mingw32/7.2.0/include",
                     "C:/Program Files/LLVM/include",
                     "C:/Program Files/LLVM/x86_64-w64-mingw32/include",
-                    "C:/Program Files/LLVM/lib/gcc/x86_64-w64-mingw32/7.2.0/include-fixed"
+                    "C:/Program Files/LLVM/lib/gcc/x86_64-w64-mingw32/7.2.0/include-fixed",
+                    "D:/vscode_workspace/c/project/c_project/LinuxSerial_Operation"
                 ],
                 "limitSymbolsToIncludedHeaders": true,
                 "databaseFilename": ""
@@ -38,5 +39,5 @@
             "cppStandard": "c++17"
         }
     ],
-    "version": 3
+    "version": 4
 }
