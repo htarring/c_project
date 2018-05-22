@@ -46,7 +46,7 @@ inline int * safe_malloc(const int length)
 	return (malloc(length));
 }
 
-inline ErrorType Safe_fClose(int *p){
+inline static ErrorType Safe_fClose(int *p){
 
 	ErrorType errorNum = No_error;
 	if( p == NULL )
@@ -75,7 +75,7 @@ static int serial_init(void)
  * output:open successful or error num
  * addtional: the port own read and write method ,and not block ctty.
  */
-int open_serial(char *name,int *const p_file_serial)
+ErrorType open_serial(char *name,int *const p_file_serial)
 {
 	*p_file_serial = open(*name, O_RDWR| O_NOCTTY);//O_NDELAY
 	if(*p_file_serial < 0)
@@ -88,7 +88,8 @@ int open_serial(char *name,int *const p_file_serial)
 	return No_error;
 }
 
-int Close_Serial(char *name,int *const p_file_serial){
+ErrorType Close_Serial(char *name,int *const p_file_serial)
+{
 	
 	ErrorType errorNum = No_error;
 	errorNum = Safe_fClose(p_file_serial);
@@ -178,8 +179,9 @@ inline static ErrorType Set_DataSpeed(int nSpeed){
 			// default :115200
 		default:  
 			cfsetispeed(&newtio,B115200);  
-			cfsetospeed(&newtio,B115200);  
-            		break;
+			cfsetospeed(&newtio,B115200);
+			errornum = error_Nostandardspeed;
+			break;
 	}
 	return errornum;
 }
@@ -201,7 +203,8 @@ inline static ErrorType Set_StopBit(int nStop){
 			//默认一个停止位
 		default:
             newtio.c_cflag &= ~CSTOPB;
-		    break;
+			errornum = error_Nostadnardstopbit;
+			break;
 	}
 
 	return errornum;

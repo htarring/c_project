@@ -2,6 +2,8 @@
 #define __SERIAL_CONFIG_H__
 
 
+
+#include "misc.h"
 /*
   serial parameters
 */
@@ -14,7 +16,6 @@
 #define MIN_READ_BIT   50     //byte not confirmed
 #define MAXREAD        50     //byte not confirmed
 
-
-
-
+ErrorType open_serial(char *name, int *const p_file_serial);
+ErrorType Close_Serial(char *name, int *const p_file_serial);
 #endif

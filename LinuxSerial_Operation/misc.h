@@ -17,6 +17,8 @@ typedef  enum ErrorType{
     error_pfile         = -98,   //非法的文件指针
     error_NostandardnBit= -97,   //不是标注数据比特长度(7\8\9)
     error_Nostandardcheck = -96, //不是标准校验方式
+    error_Nostandardspeed = -95, //速率输入出错
+    error_Nostadnardstopbit = -94,//不是标准停止位
     No_error            = 0,      //函数执行成功，无出错
 }ErrorType;
 
